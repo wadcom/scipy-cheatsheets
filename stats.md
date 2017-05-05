@@ -85,3 +85,47 @@ probability that the computer will break between 2 and 3 years of use?
     >>> scale = 1 / 4
     >>> expon.cdf(3, scale=scale) - expon.cdf(2, scale=scale)
     0.00032931841554917352
+
+## Beta Distribution
+
+ * [Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.beta.html)
+ * Intuition behind Beta distribution: [StackExchange answer](https://stats.stackexchange.com/questions/47771/what-is-the-intuition-behind-beta-distribution/47782#47782)
+ * `loc` and `scale` are not used in typical applications
+
+Example: a baseball player typically hits the target in 27% of the cases ("his
+batting average is 0.27"). Also the range of _batting_ _averages_ (e.g.
+probabilities of hitting the target) is typically from .21 to .35. If in the
+new season the player hits the target in 40 of 100 attempts, what is the
+probability that his batting average _at_ _the_ _end_ of this season will be
+over .30?
+
+Before the new season starts, the distribution of batting averages is a beta
+distribution with parameters:
+
+    >>> alpha = 81
+    >>> beta = 219
+
+These parameters are hand-picked, so that:
+
+    >>> float(alpha) / (alpha + beta)
+    0.27
+
+...and majority of the distribution lies between .21 and .35:
+![Beta(81, 219)](https://i.stack.imgur.com/RJDrz.png)
+
+At the end of the season, the player's batting average distribution will be
+a beta distribution with new parameters:
+
+    >>> hits = 40
+    >>> attempts = 100
+    >>> misses = attempts - hits
+    >>> new_alpha = alpha + hits
+    >>> new_beta = beta + misses
+    >>> new_alpha, new_beta
+    (121, 279)
+
+Now we have to calculate the probability of batting average over 30%:
+
+    >>> from scipy.stats import beta
+    >>> 1 - beta.cdf(0.3, new_alpha, new_beta)
+    0.537688086104126
